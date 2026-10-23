@@ -3,32 +3,13 @@ package crypto
 import (
 	"crypto"
 	"encoding/json"
-	"hash"
-	"io"
 )
 
-func init() {
-	crypto.RegisterHash(crypto.Hash(0), h)
-}
-
-// h is passed to crypto.RegisterHash.
-func h() hash.Hash {
-	return &f{Writer: nil}
-}
-
-type f struct{ io.Writer }
-
-// Sum helps implement the hash.Hash interface.
-func (_ *f) Sum(b []byte) []byte { return nil }
-
-// Reset helps implement the hash.Hash interface.
-func (_ *f) Reset() {}
-
-// Size helps implement the hash.Hash interface.
-func (_ *f) Size() int { return -1 }
-
-// BlockSize helps implement the hash.Hash interface.
-func (_ *f) BlockSize() int { return -1 }
+// The upstream package registered a placeholder hash for crypto.Hash(0) in an
+// init function so the "none" algorithm had a Hasher. Go 1.27 made
+// crypto.RegisterHash panic on an unknown hash function, which crashed every
+// binary linking this package at startup. SigningMethodNone never computes a
+// digest (Sign and Verify ignore their input), so the registration is dropped.
 
 // Unsecured is the default "none" algorithm.
 var Unsecured = &SigningMethodNone{

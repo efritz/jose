@@ -2,28 +2,15 @@ package jws
 
 import (
 	"crypto"
-	"hash"
-	"io"
 	"testing"
 
 	c "github.com/SermoDigital/jose/crypto"
 )
 
-func init() { crypto.RegisterHash(crypto.Hash(0), HH) }
-
-func HH() hash.Hash { return &ff{Writer: nil} }
-
-type ff struct{ io.Writer }
-
-func (f *ff) Sum(b []byte) []byte { return nil }
-func (f *ff) Reset()              {}
-func (f *ff) Size() int           { return -1 }
-func (f *ff) BlockSize() int      { return -1 }
-
 // MySigningMethod is the default "none" algorithm.
 var MySigningMethod = &TestSigningMethod{
 	Name: "SuperSignerAlgorithm1000",
-	Hash: crypto.Hash(0),
+	Hash: crypto.SHA256,
 }
 
 type TestSigningMethod struct {
